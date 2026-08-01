@@ -1,6 +1,6 @@
 {
   "name": "@categori/studio-contracts",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Provider-neutral contracts for local and hosted AI studioes",
   "type": "module",
   "license": "Apache-2.0",
@@ -24,6 +24,6 @@
     "test": "node --test test/*.test.js"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   }
 }
