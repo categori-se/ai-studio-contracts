@@ -1,0 +1,29 @@
+{
+  "name": "@categori/workbench-contracts",
+  "version": "0.1.0",
+  "description": "Provider-neutral contracts for local and hosted AI workbenches",
+  "type": "module",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./src/index.js",
+    "./applications": "./src/applications.js",
+    "./gateway": "./src/gateway.js",
+    "./projects": "./src/projects.js",
+    "./schemas/project-manifest.schema.json": "./schemas/project-manifest.schema.json"
+  },
+  "files": [
+    "src",
+    "schemas",
+    "README.md",
+    "SECURITY.md",
+    "CONTRIBUTING.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
