@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.example.invalid/workbench/project-manifest.schema.json",
-  "title": "Workbench project manifest",
+  "$id": "https://schemas.example.invalid/studio/project-manifest.schema.json",
+  "title": "Studio project manifest",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "id", "name", "repository", "defaultBranch", "commands", "modelPolicy"],

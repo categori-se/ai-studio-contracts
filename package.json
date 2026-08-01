@@ -1,7 +1,7 @@
 {
-  "name": "@categori/workbench-contracts",
-  "version": "0.1.0",
-  "description": "Provider-neutral contracts for local and hosted AI workbenches",
+  "name": "@categori/studio-contracts",
+  "version": "0.2.0",
+  "description": "Provider-neutral contracts for local and hosted AI studioes",
   "type": "module",
   "license": "Apache-2.0",
   "exports": {
