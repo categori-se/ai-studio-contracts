@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:categori:studio:evaluation-rubric:v1",
+  "title": "Studio evaluation rubric",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "name", "version", "criteria", "passingScore", "humanReviewRequired"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "id": {"type": "string", "pattern": "^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$"},
+    "name": {"type": "string", "minLength": 1, "maxLength": 100, "pattern": "\\S"},
+    "version": {"type": "string", "minLength": 1, "maxLength": 100, "pattern": "\\S"},
+    "description": {"type": "string", "minLength": 1, "maxLength": 2000, "pattern": "\\S"},
+    "criteria": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 25,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "description", "weight", "minScore", "maxScore"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$"},
+          "label": {"type": "string", "minLength": 1, "maxLength": 100, "pattern": "\\S"},
+          "description": {"type": "string", "minLength": 1, "maxLength": 1000, "pattern": "\\S"},
+          "weight": {"type": "number", "exclusiveMinimum": 0},
+          "minScore": {"type": "number"},
+          "maxScore": {"type": "number"}
+        }
+      }
+    },
+    "passingScore": {"type": "number"},
+    "humanReviewRequired": {"type": "boolean"}
+  }
+}

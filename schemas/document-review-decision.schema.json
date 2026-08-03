@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:categori:studio:document-review-decision:v1",
+  "title": "Studio immutable document-review decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "job_id",
+    "evaluation_id",
+    "project_id",
+    "outcome",
+    "summary",
+    "result_uri",
+    "result_sha256",
+    "result_version_id",
+    "result_etag",
+    "machine_outcome",
+    "actor",
+    "actor_subject",
+    "actor_label",
+    "actor_groups",
+    "created_at",
+    "effect",
+    "deploy_authorized",
+    "trading_authorized",
+    "production_deployed",
+    "source_mutated"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "id": {"$ref": "#/$defs/uuidV4"},
+    "job_id": {"$ref": "#/$defs/uuidV4"},
+    "evaluation_id": {"$ref": "#/$defs/uuidV4"},
+    "project_id": {"$ref": "#/$defs/slug"},
+    "outcome": {"enum": ["approved", "changes_requested", "rejected"]},
+    "summary": {"$ref": "#/$defs/text2000"},
+    "result_uri": {"$ref": "#/$defs/safeUri"},
+    "result_sha256": {"$ref": "#/$defs/sha256"},
+    "result_version_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^(?!null$)(?!\\s)(?!.*\\s$)[^\\u0000-\\u001F\\u007F]+$"
+    },
+    "result_etag": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^(?!\\s)(?!.*\\s$)[^\\u0000-\\u001F\\u007F]+$"
+    },
+    "machine_outcome": {"enum": ["passed", "failed"]},
+    "actor": {"$ref": "#/$defs/identity300"},
+    "actor_subject": {"$ref": "#/$defs/identity300"},
+    "actor_label": {"$ref": "#/$defs/text200"},
+    "actor_groups": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/text100"}
+    },
+    "created_at": {"type": "integer", "minimum": 0},
+    "effect": {"const": "human_evaluation_review"},
+    "deploy_authorized": {"const": false},
+    "trading_authorized": {"const": false},
+    "production_deployed": {"const": false},
+    "source_mutated": {"const": false}
+  },
+  "$defs": {
+    "uuidV4": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "safeUri": {
+      "type": "string",
+      "format": "uri",
+      "maxLength": 2000,
+      "pattern": "^[A-Za-z][A-Za-z0-9+.-]*://(?![^/?#]*@)[^?#]+$"
+    },
+    "identity300": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300,
+      "pattern": "^(?!\\s)(?!.*\\s$)[^\\u0000-\\u001F\\u007F]+$"
+    },
+    "text100": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "pattern": "^(?=[\\s\\S]*\\S)[^\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F]*$"
+    },
+    "text200": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^(?=[\\s\\S]*\\S)[^\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F]*$"
+    },
+    "text2000": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000,
+      "pattern": "^(?=[\\s\\S]*\\S)[^\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F]*$"
+    }
+  }
+}

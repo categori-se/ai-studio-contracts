@@ -1,25 +1,37 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.example.invalid/studio/project-manifest.schema.json",
+  "$id": "urn:categori:studio:project-manifest:v1",
   "title": "Studio project manifest",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "id", "name", "repository", "defaultBranch", "commands", "modelPolicy"],
+  "$defs": {
+    "slug": {"type": "string", "pattern": "^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$"},
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500,
+      "pattern": "^(?=[\\s\\S]*\\S)(?!/)(?![A-Za-z]:)(?![\\s\\S]*\\\\)(?![\\s\\S]*(?:^|/)\\.{1,2}(?:/|$))[\\s\\S]+$"
+    },
+    "sensitivity": {"enum": ["public", "internal", "confidential", "restricted"]},
+    "approvalStage": {"enum": ["candidate", "release", "rollback"]}
+  },
   "properties": {
     "schemaVersion": {"const": 1},
-    "id": {"type": "string", "pattern": "^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$"},
-    "name": {"type": "string", "minLength": 1, "maxLength": 100},
-    "repository": {"type": "string", "minLength": 1, "maxLength": 500},
-    "defaultBranch": {"type": "string", "minLength": 1, "maxLength": 100},
-    "dataSensitivity": {"enum": ["public", "internal", "confidential", "restricted"]},
+    "id": {"$ref": "#/$defs/slug"},
+    "name": {"type": "string", "minLength": 1, "maxLength": 100, "pattern": "\\S"},
+    "summary": {"type": "string", "minLength": 1, "maxLength": 500, "pattern": "\\S"},
+    "repository": {"type": "string", "minLength": 1, "maxLength": 500, "pattern": "\\S"},
+    "defaultBranch": {"type": "string", "minLength": 1, "maxLength": 100, "pattern": "\\S"},
+    "dataSensitivity": {"$ref": "#/$defs/sensitivity"},
     "commands": {
       "type": "object",
       "additionalProperties": false,
       "required": ["checks"],
       "properties": {
-        "install": {"type": "string", "maxLength": 500},
-        "checks": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 500}},
-        "build": {"type": "string", "maxLength": 500}
+        "install": {"type": "string", "minLength": 1, "maxLength": 500, "pattern": "\\S"},
+        "checks": {"type": "array", "items": {"type": "string", "minLength": 1, "pattern": "\\S"}},
+        "build": {"type": "string", "minLength": 1, "maxLength": 500, "pattern": "\\S"}
       }
     },
     "modelPolicy": {
@@ -29,6 +41,113 @@
       "properties": {
         "mode": {"enum": ["best_quality", "balanced_cost", "local_only", "no_external_data", "project_default"]}
       }
-    }
+    },
+    "owners": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "role"],
+        "properties": {
+          "id": {"$ref": "#/$defs/slug"},
+          "role": {"type": "string", "minLength": 1, "maxLength": 100, "pattern": "\\S"}
+        }
+      }
+    },
+    "purpose": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["problem"],
+      "properties": {
+        "problem": {"type": "string", "minLength": 1, "maxLength": 2000, "pattern": "\\S"},
+        "audiences": {"type": "array", "items": {"type": "string", "minLength": 1, "pattern": "\\S"}},
+        "permittedClaims": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "statement", "evidenceRefs"],
+            "properties": {
+              "id": {"$ref": "#/$defs/slug"},
+              "statement": {"type": "string", "minLength": 1, "maxLength": 2000, "pattern": "\\S"},
+              "evidenceRefs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/slug"}}
+            }
+          }
+        }
+      }
+    },
+    "resources": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "uri"],
+        "properties": {
+          "id": {"$ref": "#/$defs/slug"},
+          "kind": {"enum": ["repository", "document", "dataset", "object-store", "application", "model", "prompt", "agent", "integration"]},
+          "uri": {"type": "string", "minLength": 1, "maxLength": 2000, "pattern": "\\S"},
+          "role": {"type": "string", "minLength": 1, "maxLength": 100, "pattern": "\\S"},
+          "sensitivity": {"$ref": "#/$defs/sensitivity"}
+        }
+      }
+    },
+    "agentProfiles": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "instructionsPath"],
+        "properties": {
+          "id": {"$ref": "#/$defs/slug"},
+          "instructionsPath": {"$ref": "#/$defs/relativePath"},
+          "allowedTools": {"type": "array", "items": {"type": "string", "minLength": 1, "pattern": "\\S"}},
+          "acceptanceCriteria": {"type": "array", "items": {"type": "string", "minLength": 1, "pattern": "\\S"}}
+        }
+      }
+    },
+    "evaluationSuites": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "rubricPath"],
+        "properties": {
+          "id": {"$ref": "#/$defs/slug"},
+          "rubricPath": {"$ref": "#/$defs/relativePath"},
+          "requiredFor": {"type": "array", "items": {"$ref": "#/$defs/approvalStage"}}
+        }
+      }
+    },
+    "approvalPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requiredFor", "roles"],
+      "properties": {
+        "requiredFor": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/approvalStage"}},
+        "roles": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1, "pattern": "\\S"}}
+      }
+    },
+    "deploymentTargets": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "environment"],
+        "properties": {
+          "id": {"$ref": "#/$defs/slug"},
+          "kind": {"enum": ["static-site", "serverless", "container", "notebook", "other"]},
+          "environment": {"type": "string", "minLength": 1, "maxLength": 100, "pattern": "\\S"},
+          "releaseManifestUri": {"type": "string", "minLength": 1, "maxLength": 2000, "pattern": "\\S"}
+        }
+      }
+    },
+    "costCenter": {"type": "string", "minLength": 1, "maxLength": 100, "pattern": "\\S"},
+    "riskLevel": {"enum": ["low", "moderate", "high", "critical"]}
   }
 }

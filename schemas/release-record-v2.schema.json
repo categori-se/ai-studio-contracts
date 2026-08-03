@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:categori:studio:release-record:v2",
+  "title": "Studio verified release record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion", "projectId", "repository", "targetId", "environment",
+    "commitSha", "artifact", "workflow", "actor", "operation", "result",
+    "deployedAt", "deployedUrl", "verification"
+  ],
+  "$defs": {
+    "slug": {"type": "string", "pattern": "^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$"},
+    "sha": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"},
+    "timestamp": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$"},
+    "httpsUri": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://[^@/?#\\s]+(?:/[^?#\\s]*)?$",
+      "maxLength": 2000
+    },
+    "releaseUri": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^(?:https://[^@/?#\\s]+(?:/[^?#\\s]*)?|s3://[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]/[^?#\\s]+)$",
+      "maxLength": 2000
+    },
+    "releaseReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["uri", "versionId", "recordSha256"],
+      "properties": {
+        "uri": {"$ref": "#/$defs/releaseUri"},
+        "versionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "pattern": "^[^\\u0000-\\u001f\\u007f]+$",
+          "not": {"const": "null"}
+        },
+        "recordSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "deploymentAuthorization": {
+      "type": "object",
+      "$comment": "The JavaScript validator also requires the URI path project segment to equal projectId and its basename to equal id; portable JSON Schema cannot compare sibling string values.",
+      "additionalProperties": false,
+      "required": ["uri", "versionId", "recordSha256", "id"],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^s3://[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]/(?:[^/?#\\\\\\s]+/)*projects/[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?/deployment-authorizations/v1/[0-9a-f]{64}\\.json$",
+          "maxLength": 2000
+        },
+        "versionId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._+=:@/-]{1,1024}$",
+          "not": {"const": "null"}
+        },
+        "recordSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "id": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  },
+  "properties": {
+    "schemaVersion": {"const": 2},
+    "projectId": {"$ref": "#/$defs/slug"},
+    "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$", "maxLength": 500},
+    "targetId": {"$ref": "#/$defs/slug"},
+    "environment": {"$ref": "#/$defs/slug"},
+    "commitSha": {"$ref": "#/$defs/sha"},
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["uri", "digest"],
+      "properties": {
+        "uri": {"$ref": "#/$defs/releaseUri"},
+        "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "runId", "url"],
+      "properties": {
+        "provider": {"$ref": "#/$defs/slug"},
+        "runId": {"type": "string", "minLength": 1, "maxLength": 200, "pattern": "\\S"},
+        "url": {"$ref": "#/$defs/httpsUri"}
+      }
+    },
+    "actor": {"type": "string", "minLength": 1, "maxLength": 200, "pattern": "\\S"},
+    "operation": {"enum": ["DEPLOY", "ROLLBACK"]},
+    "result": {"enum": ["SUCCEEDED", "ROLLED_BACK"]},
+    "deployedAt": {"$ref": "#/$defs/timestamp"},
+    "deployedUrl": {"$ref": "#/$defs/httpsUri"},
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "url", "verifiedAt"],
+      "properties": {
+        "method": {"$ref": "#/$defs/slug"},
+        "url": {"$ref": "#/$defs/httpsUri"},
+        "verifiedAt": {"$ref": "#/$defs/timestamp"}
+      }
+    },
+    "deploymentAuthorization": {"$ref": "#/$defs/deploymentAuthorization"},
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["replacedRelease", "restoredFromRelease"],
+      "properties": {
+        "replacedRelease": {"$ref": "#/$defs/releaseReference"},
+        "restoredFromRelease": {"$ref": "#/$defs/releaseReference"}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"type": "object", "properties": {"operation": {"const": "ROLLBACK"}}},
+      "then": {
+        "type": "object",
+        "required": ["rollback"],
+        "properties": {"result": {"const": "ROLLED_BACK"}}
+      },
+      "else": {
+        "type": "object",
+        "properties": {"result": {"const": "SUCCEEDED"}},
+        "not": {"type": "object", "required": ["rollback"]}
+      }
+    }
+  ]
+}
