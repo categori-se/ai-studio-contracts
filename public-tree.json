@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "repository": "categori-se/studio-contracts",
+  "repository": "categori-se/ai-studio-contracts",
   "files": [
     ".github/workflows/ci.yml",
     ".gitignore",
