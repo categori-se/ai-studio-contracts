@@ -106,7 +106,7 @@ export async function scanPublicTree(root = resolve(dirname(fileURLToPath(import
     findings.push("public-tree.json: fields do not match the reviewed schema");
   }
   const packageMatch = /^@categori\/(studio-(?:contracts|core|examples))$/.exec(packageMetadata.name || "");
-  const expectedRepository = packageMatch ? `categori-se/${packageMatch[1]}` : "";
+  const expectedRepository = packageMatch ? `categori-se/ai-${packageMatch[1]}` : "";
   if (manifest.schema_version !== 1) findings.push("public-tree.json: schema_version must equal 1");
   if (manifest.repository !== expectedRepository) findings.push(`public-tree.json: repository must equal ${expectedRepository}`);
   if (!packageMatch) findings.push("package.json: package name is outside the reviewed categori public set");
