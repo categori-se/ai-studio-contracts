@@ -88,6 +88,6 @@ Studio Contracts stays public because portability is most valuable at the bounda
 
 ## Status and contributing
 
-`package.json` identifies this source line as version 0.4.0. A checkout is the published v0.4.0 source release only when the repository's `v0.4.0` tag resolves to that exact commit; otherwise treat `main` as development. Earlier tags remain available for comparison and compatibility testing. The package has not been published to npm, so pin an exact Git tag or commit when consuming it.
+`package.json` identifies this source line as version 0.5.0. A checkout is the published v0.5.0 source release only when the repository's `v0.5.0` tag resolves to that exact commit; otherwise treat `main` as development. Earlier tags remain available for comparison and compatibility testing. The package has not been published to npm, so pin an exact Git tag or commit when consuming it.
 
 For a contract change, [open an issue](https://github.com/categori-se/ai-studio-contracts/issues) with the concrete workflow, compatibility effect, and a minimal example before opening a pull request. Contributions must remain provider-neutral, include tests, and follow [`CONTRIBUTING.md`](./CONTRIBUTING.md). The repository is licensed under the Apache License, Version 2.0.

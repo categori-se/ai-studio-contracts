@@ -1,6 +1,6 @@
 {
   "name": "@categori/studio-contracts",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Provider-neutral contracts for local and hosted AI studios",
   "type": "module",
   "license": "Apache-2.0",
